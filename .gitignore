@@ -1,0 +1,48 @@
+cat > .gitignore <<'EOF'
+# --- Secrets & local config ---
+.env
+.env.*
+secrets/**
+!secrets/.gitkeep
+*.secret
+*.credentials
+
+# Common key/cert file types (never commit these)
+*.pem
+*.key
+*.p12
+*.pfx
+*.cer
+*.crt
+*.jks
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+pip-wheel-metadata/
+.cache/
+
+# --- Notebooks ---
+.ipynb_checkpoints/
+
+# --- Databricks/workspace noise (if they appear) ---
+.databricks/
+dbfs_mounts/
+
+# --- Data (keep reference tables, ignore heavy raw dumps) ---
+data/**
+!data/reference_tables/**
+!data/README.md
+!data/.gitkeep
+
+# --- OS junk ---
+.DS_Store
+Thumbs.db
+
+# --- Power BI ---
+# Keep your final report file, ignore backups/exports
+dashboard/*.pbix.backup
+EOF
