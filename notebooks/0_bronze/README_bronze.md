@@ -86,15 +86,29 @@ scripts/
 ## 🧪 Smoke Tests
 
 ```sql
--- ECB coverage
+-- ECB coverage & schema
+DESCRIBE TABLE fx_impact.bronze_ecb_fx_rates;
 SELECT currency, MIN(date) AS min_d, MAX(date) AS max_d, COUNT(*) AS rows
-FROM fx_impact.bronze_ecb_fx_rates
-GROUP BY currency;
+FROM fx_impact.bronze_ecb_fx_rates GROUP BY currency;
 
 -- Comtrade coverage
 SELECT year, COUNT(*) AS rows
 FROM fx_impact.bronze_comtrade_imports
 GROUP BY year ORDER BY year;
+
+-- Months present in Comtrade but missing in FX (should be none)
+WITH c AS (
+  SELECT DISTINCT to_date(date_trunc('month', period_date)) AS month
+  FROM fx_impact.bronze_comtrade_imports
+),
+f AS (
+  SELECT DISTINCT to_date(date_trunc('month', date)) AS month
+  FROM fx_impact.bronze_ecb_fx_rates
+)
+SELECT c.month
+FROM c LEFT JOIN f USING (month)
+WHERE f.month IS NULL
+ORDER BY c.month;
 ```
 
 ---
@@ -103,35 +117,30 @@ GROUP BY year ORDER BY year;
 
 **Full refresh (safe if schema unchanged):**
 ```python
-(sdf.write
-  .format("delta")
-  .mode("overwrite")
-  .option("overwriteSchema","true")
-  .partitionBy("currency")  # ECB
-  .saveAsTable("fx_impact.bronze_ecb_fx_rates"))
+# ECB
+(sdf.write.format("delta").mode("overwrite")
+ .option("overwriteSchema","true")
+ .partitionBy("currency")
+ .saveAsTable("fx_impact.bronze_ecb_fx_rates"))
 ```
 
 ```python
-(sdf.write
-  .format("delta")
-  .mode("overwrite")
-  .option("overwriteSchema","true")
-  .partitionBy("year","cmdCode")  # Comtrade
-  .saveAsTable("fx_impact.bronze_comtrade_imports"))
+# Comtrade
+(sdf.write.format("delta").mode("overwrite")
+ .option("overwriteSchema","true")
+ .partitionBy("year","cmdCode")
+ .saveAsTable("fx_impact.bronze_comtrade_imports"))
 ```
 
 **Incremental (Comtrade 2025 only):**
 ```python
 from pyspark.sql import functions as F
-
 sdf_2025 = sdf.filter(F.col("year")==2025)
 
-(sdf_2025.write
-  .format("delta")
-  .mode("overwrite")
-  .option("replaceWhere","year = 2025")  # overwrite only this partition
-  .partitionBy("year","cmdCode")
-  .saveAsTable("fx_impact.bronze_comtrade_imports"))
+(sdf_2025.write.format("delta").mode("overwrite")
+ .option("replaceWhere","year = 2025")
+ .partitionBy("year","cmdCode")
+ .saveAsTable("fx_impact.bronze_comtrade_imports"))
 ```
 
 ---
