@@ -55,13 +55,15 @@ This filters data to **last complete month** (e.g., excludes current partial mon
 
 ```python
 df_metrics = spark.sql("""
-  SELECT month, cmdCode, cmdDesc, covid_period,
-         import_usd, import_eur,
-         USD_per_EUR, JPY_per_EUR, CNY_per_EUR,
-         share_of_total_eur, eur_mom_pct, eur_yoy_pct,
-         eur_vol_3m, eur_vol_6m, fx_mom_pct, fx_vol_3m, fx_vol_6m
+  SELECT month, cmdCode,
+       cmdDesc,            -- short (visuals)
+       cmdDesc_long,       -- full (tooltips)
+       covid_period,
+       import_usd, import_eur,
+       USD_per_EUR, JPY_per_EUR, CNY_per_EUR,
+       share_of_total_eur, eur_mom_pct, eur_yoy_pct,
+       eur_vol_3m, eur_vol_6m, fx_mom_pct, fx_vol_3m, fx_vol_6m
   FROM fx_impact.gold_monthly_metrics
-  -- (optional WHERE month <= last complete month is applied in the notebook)
   ORDER BY month, cmdCode
 """)
 display(df_metrics)  # ← Click Download → CSV
@@ -99,7 +101,10 @@ Save as **`gold_period_summary.csv`**.
 
 ```python
 display(spark.sql("""
-  SELECT cmdCode, cmdDesc, pre_eur, during_eur, post_eur,
+  SELECT cmdCode, 
+         cmdDesc,            -- short (visuals)
+         cmdDesc_long,       -- full (tooltips)
+         pre_eur, during_eur, post_eur,
          abs_change_during_vs_pre, pct_change_during_vs_pre,
          abs_change_post_vs_pre,   pct_change_post_vs_pre
   FROM fx_impact.gold_covid_period_kpis_by_cmd
@@ -110,6 +115,15 @@ display(spark.sql("""
 Save as **`gold_covid_period_kpis_by_cmd.csv`**.
 
 > Want pre-ranked tables (Top movers up/down)? Add an extra export from `fx_impact.gold_covid_top_movers`.
+
+### If your tenant blocks OneDrive/Lakehouse
+Use **Create → Paste or manually enter data** in the Service:
+1) Paste `gold_monthly_metrics.csv` (all rows) as table **metrics**.
+2) In Model view, add a calculated **Date** column if `month` pasted as text:
+   ```DAX
+   month_date =
+   VAR s = SELECTEDVALUE ( metrics[month] )
+   RETURN DATE ( VALUE(LEFT(s,4)), VALUE(MID(s,6,2)), VALUE(RIGHT(s,2)) )
 
 ---
 
@@ -222,7 +236,14 @@ When you move off CE:
 * Keep the same visuals/measures; just repoint the data source to the Warehouse.
 
 ---
+## Changelog
 
+### 2025-08-21
+- Adopted short HS labels in Gold: `cmdDesc` (short), `cmdDesc_long` (full).
+- Power BI export now includes `cmdDesc_long` for tooltips.
+- Added Service-only paste workflow (for tenants without OneDrive/Lakehouse).
+
+---
 **Owner:** `notebooks/3_exports/99_export_powerbi.ipynb`
 **Last updated:** *20/08/2025*
 

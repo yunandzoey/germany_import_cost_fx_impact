@@ -49,6 +49,7 @@ Works on **Databricks CE** (managed Delta only; no `/FileStore`). Export CSV fro
 * **COVID periods**:
   Pre (< 2020-01-01), During (≤ 2021-12-31), Post (≥ 2022-01-01).
   05-notebook supports toggles for including/excluding 2025 YTD or fixing Post to 2022–2024.
+* **Commodity labels:** `cmdDesc` is the **short label** used in visuals (e.g., “Mineral fuels”), and `cmdDesc_long` preserves the full HS description for tooltips. This swap is applied in Gold so all downstream tools stay consistent.
 
 ---
 
@@ -56,12 +57,13 @@ Works on **Databricks CE** (managed Delta only; no `/FileStore`). Export CSV fro
 
 **`fx_impact.gold_monthly_metrics`** (month × HS-2)
 
-* Keys: `month` DATE, `cmdCode` STRING
-* Fields: `cmdDesc`, `covid_period`, `import_usd`, `import_eur`,
-  `USD_per_EUR`, `JPY_per_EUR`, `CNY_per_EUR`,
-  `usd_obs_days`, `usd_days_total`, `usd_null_share`,
-  `total_eur_month`, `share_of_total_eur`,
-  `eur_mom_pct`, `eur_yoy_pct`, `fx_mom_pct`,
+- Keys: `month` DATE, `cmdCode` STRING  
+- Fields: `cmdDesc` *(short)*, `cmdDesc_long` *(full)*, `covid_period`,  
+  `import_usd`, `import_eur`,  
+  `USD_per_EUR`, `JPY_per_EUR`, `CNY_per_EUR`,  
+  `usd_obs_days`, `usd_days_total`, `usd_null_share`,  
+  `total_eur_month`, `share_of_total_eur`,  
+  `eur_mom_pct`, `eur_yoy_pct`, `fx_mom_pct`,  
   `eur_vol_3m`, `eur_vol_6m`, `fx_vol_3m`, `fx_vol_6m`.
 
 **`fx_impact.gold_monthly_totals`** (month)
@@ -183,9 +185,17 @@ FX Vol 3M  = AVERAGE ( 'gold_monthly_metrics'[fx_vol_3m] )
 * **No rows in Post-COVID tables?** You filtered out 2025 or fixed Post to 2022–2024—verify flags in `05_pre_post_covid_analysis`.
 * **Shares ≠ 1:** indicates missing commodities in a month; check Silver coverage.
 * **MoM/YoY NULLs:** expected when prior month/year is zero or missing.
+* **Long HS names in visuals?** Ensure Gold was rebuilt after adding `cmdDesc_short` in Silver. Gold should write `cmdDesc_short AS cmdDesc` and keep `cmdDesc AS cmdDesc_long`. Re-run `04_fx_adjusted_cost_volatility.ipynb` before exporting.
 
 ---
+## Changelog
 
+### 2025-08-21
+- Adopted short HS labels in Gold: `cmdDesc` (short), `cmdDesc_long` (full).
+- Power BI export now includes `cmdDesc_long` for tooltips.
+- Added Service-only paste workflow (for tenants without OneDrive/Lakehouse).
+
+---
 **Owner:** Gold layer notebooks (`04_…`, `05_…`)
 **Last updated:** *20/08/2025*
 
