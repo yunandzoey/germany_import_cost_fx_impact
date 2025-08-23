@@ -80,11 +80,19 @@ GERMANY_IMPORT_COST_FX_IMPACT/
 ## 📅 Milestone Status
 | Milestone | Status |
 |----------|--------|
-| Project setup & bronze ingestion | ⏳ In Progress |
-| Silver table development | ⏳ Not started |
-| Gold layer & metrics | ⏳ Not started |
-| Power BI dashboard | ⏳ Not started |
-| Final packaging | ⏳ Not started |
+| Project setup & bronze ingestion | ✅ Finished |
+| Silver table development | ✅ Finished |
+| Gold layer & metrics | ✅ Finished |
+| Power BI dashboard | ✅ Finished(v1) |
+| Final packaging | ✅ Finished |
+
+## Delivery Status (v1)
+- ✅ End-to-end pipeline (Bronze/Silver/Gold) with DQ checks and COVID segmentation
+- ✅ Power BI report published (PBIX + PDF)
+- ✅ FX vs Imports analysis (rate + 3-mo volatility), commodity mix, and period deltas
+
+**Open the report:** `dashboard/Germany_Imports_FX_Impact_v1.pbix`  
+**Snapshot PDF:** `dashboard/exports/Germany_Imports_FX_Impact_v1.pdf`
 
 
 ## 🧭 Forward Outlook (2025+)
