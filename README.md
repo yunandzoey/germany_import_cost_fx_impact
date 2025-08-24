@@ -20,11 +20,44 @@ Analyze how EUR/USD, EUR/CNY, and EUR/JPY exchange rates influenced Germany’s 
 - **Silver**: Cleaned, aggregated monthly data
 - **Gold**: FX-adjusted import costs, volatility metrics, COVID period tags
 
-## 📦 Deliverables
-- ✅ Structured Databricks notebooks (bronze/silver/gold)
-- ✅ GitHub repo with clean code & documentation
-- ⏳ Power BI dashboard (in progress)
-- ⏳ Pre/Post COVID analysis & insights (in progress)
+## Delivery Status (v1)
+- ✅ End-to-end pipeline (Bronze/Silver/Gold) with DQ checks and COVID segmentation
+- ✅ Power BI report published (PBIX + PDF)
+- ✅ FX vs Imports analysis (rate + 3-mo volatility), commodity mix, and period deltas
+**Open the report:** `dashboard/Germany_Imports_FX_Impact_v1.pbix`  
+**Snapshot PDF:** `dashboard/exports/Germany_Imports_FX_Impact_v1.pdf`
+
+# 📊 Dashboard Tour
+
+> Data: ECB FX (USD/EUR, JPY/EUR, CNY/EUR) + UN Comtrade (DE imports, HS-2)  
+> Model: Databricks Bronze → Silver → Gold → Power BI (Fabric Service)  
+> Slicers (synced on analytic pages): **Commodity (HS-2)**, **Month**
+
+## 1) Overview
+![Overview](docs/screenshots/overview.png)
+- Monthly **Imports (EUR)** since 2018 + KPIs: **Latest month**, **Latest imports (EUR bn)**, **FX avg (USD/EUR)**, **MoM change (%)**.
+- KPIs are locked to the **last complete month**; line shows trend/shocks (COVID, 2022 energy).
+
+## 2) FX vs Costs
+![FX vs Costs](docs/screenshots/fx_vs_costs.png)
+- **Combo chart** — bars: **Imports (EUR bn)** (primary), line: **USD/EUR** (secondary); below: **FX 3-mo volatility**.
+- Read: weaker EUR + higher volatility often **amplify** euro-denominated import costs.
+
+## 3) Commodity Mix
+![Commodity Mix](docs/screenshots/commodity_mix.png)
+- Stacked area of monthly mix by HS-2; **Latest month by commodity (EUR bn)**; **Share of total (%)**.
+- Shows who drives the bill now (e.g., Machinery, Electrical & electronics) and mix shifts post-COVID.
+
+## 4) COVID Impact (Pre / During / Post)
+![COVID Impact](docs/screenshots/covid_impact.png)
+- **Avg monthly imports** by period and **Post vs Pre (%)** by commodity.
+- Post-COVID levels are structurally higher (e.g., Electronics ≈ +45%, Fuels ≈ +41%).
+
+## 5) Details (Audit)
+![Details](docs/screenshots/details.png)
+- Table of **Month × Commodity** with **Imports (EUR)**, **USD/EUR**, **MoM%**, **YoY%**, **FX volatility**.
+- Data bars + diverging colors surface spikes; use for validation and deep-dive.
+
 
 ## 📁 Repo layout (Planned)
 ```
@@ -85,15 +118,6 @@ GERMANY_IMPORT_COST_FX_IMPACT/
 | Gold layer & metrics | ✅ Finished |
 | Power BI dashboard | ✅ Finished(v1) |
 | Final packaging | ✅ Finished |
-
-## Delivery Status (v1)
-- ✅ End-to-end pipeline (Bronze/Silver/Gold) with DQ checks and COVID segmentation
-- ✅ Power BI report published (PBIX + PDF)
-- ✅ FX vs Imports analysis (rate + 3-mo volatility), commodity mix, and period deltas
-
-**Open the report:** `dashboard/Germany_Imports_FX_Impact_v1.pbix`  
-**Snapshot PDF:** `dashboard/exports/Germany_Imports_FX_Impact_v1.pdf`
-
 
 ## 🧭 Forward Outlook (2025+)
 
